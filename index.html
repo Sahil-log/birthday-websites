@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy Birthday Ishu!</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #faeab1 0%, #fccb90 100%);
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+    }
+    .center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: relative;
+      z-index: 10;
+      padding: 0 1em;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3em;
+      animation: glow 2s infinite alternate;
+      color: #ff5e62;
+      margin-bottom: 0.5em;
+      text-shadow: 0 0 20px #fefefe;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 20px #ff5e62; }
+      to   { text-shadow: 0 0 40px #fff176, 0 0 20px #fefefe; }
+    }
+    .wish {
+      background: rgba(255,255,255,0.75);
+      padding: 1em 2em;
+      border-radius: 14px;
+      font-size: 1.6em;
+      color: #6a0572;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      margin-bottom: 1em;
+      margin-top: 0;
+      max-width: 600px;
+      line-height: 1.3;
+    }
+    .balloons {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 90vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .confetti {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .hearts {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .heart {
+      position: absolute;
+      bottom: -10px;
+      width: 20px;
+      height: 20px;
+      background: red;
+      transform: rotate(45deg);
+      animation: floatUp 6s linear infinite;
+    }
+    .heart::before, .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: red;
+      border-radius: 50%;
+    }
+    .heart::before { top: -10px; left: 0; }
+    .heart::after { left: -10px; top: 0; }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(45deg); opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(45deg); opacity: 0; }
+    }
+    .footer {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: #9e0175;
+      font-size: 1em;
+      z-index: 20;
+      user-select: none;
+    }
+    button {
+      background: linear-gradient(135deg,#f857a6 0%,#ff5858 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.7em 2em;
+      font-size: 1.2em;
+      margin-top: 1em;
+      cursor: pointer;
+      box-shadow: 0 4px 18px 0 rgba(249,162,34,0.2);
+      transition: background 0.3s;
+      user-select: none;
+    }
+    button:hover {
+      background: linear-gradient(135deg,#ff5858 0%,#f857a6 100%);
+    }
+  </style>
+</head>
+<body>
+  <div class="balloons"></div>
+  <canvas class="confetti"></canvas>
+  <div class="hearts"></div>
+  <div class="center">
+    <h1>Happy Birthday Ishu!</h1>
+    <div class="wish" id="wish">
+      Wishing you a magical day filled with love, joy and all your favorite things! <br />
+      You are amazing!
+    </div>
+    <button onclick="generateWish()">Surprise Me!</button>
+    <button onclick="toggleMusic()" id="music-btn">Pause Music</button>
+  </div>
+  <div class="footer">
+    Made with ♥ for Ishu
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bg-music" autoplay loop>
+    <source src="music.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    // Balloon Code
+    const balloonColors = ['#ff5e62','#f9d423','#76c7c0','#fcb5bf','#5181b8','#ffd700','#fd6a78'];
+    const balloonCount = 16;
+    const balloonsDiv = document.querySelector('.balloons');
+    for (let i = 0; i < balloonCount; i++) {
+      const b = document.createElement("div");
+      const left = Math.random() * 95 + 2;
+      b.style.cssText = `
+        position:absolute;
+        left:${left}vw;
+        top:${100 + Math.random() * 100}px;
+        width:36px;height:50px;
+        border-radius:50% 50% 60% 60%;
+        background:${balloonColors[i % balloonColors.length]};
+        animation:balloonUp 6.5s ${i / 3}s linear infinite;
+        z-index:${i % 2 === 0 ? 2 : 1};
+        box-shadow:0 2px 10px rgba(0,0,0,0.09);
+      `;
+      balloonsDiv.appendChild(b);
+    }
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes balloonUp {
+        0%   { transform: translateY(0);}
+        100% { transform: translateY(-80vh);}
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Confetti Animation
+    const canvas = document.querySelector('.confetti');
+    const ctx = canvas.getContext('2d');
+    let W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+    let confs = [];
+    function Confetti(){
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.r = Math.random() * 8 + 4;
+      this.d = Math.random() * W / 50;
+      this.color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+      this.tilt = Math.random() * 10 - 5;
+      this.tiltAngle = 0;
+    }
+    for (let i = 0; i < 90; i++) confs.push(new Confetti());
+    function drawConfetti(){
+      ctx.clearRect(0,0,W,H);
+      for (let i = 0; i < confs.length; i++) {
+        let c = confs[i];
+        ctx.beginPath();
+        ctx.ellipse(c.x, c.y, c.r, c.r/2, 0, 0, 2 * Math.PI);
+        ctx.fillStyle = c.color;
+        ctx.fill();
+      }
+      updateConfetti();
+      requestAnimationFrame(drawConfetti);
+    }
+    function updateConfetti(){
+      for (let i = 0; i < confs.length; i++) {
+        let c = confs[i];
+        c.y += Math.sin(c.d) + 2;
+        c.x += Math.sin(0.01 * c.y);
+        c.tiltAngle += 0.05;
+        c.tilt = Math.sin(c.tiltAngle) * 8;
+        if (c.y > H) {
+          c.x = Math.random() * W;
+          c.y = -10;
+        }
+      }
+    }
+    drawConfetti();
+    window.addEventListener('resize', () => {
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = W; canvas.height = H;
+    });
+
+    // Floating Hearts
+    const heartsDiv = document.querySelector('.hearts');
+    setInterval(()=>{
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.style.left = Math.random()*100 + "vw";
+      h.style.animationDuration = (3 + Math.random() * 3) + "s";
+      heartsDiv.appendChild(h);
+      setTimeout(()=>h.remove(),6000);
+    },700);
+
+    // Wishes Generator
+    const wishes = [
+      "May all your dreams bloom like flowers in a spring garden!",
+      "Here's wishing you joy, wonder and laughter all year long!",
+      "Hope your special day sparkles with magic moments, Ishu!",
+      "Happy Birthday to a truly wonderful soul. Shine on!",
+      "Sending you love, hugs, and sweet surprises today!",
+      "Celebrate yourself today—you're amazing and loved!",
+      "Wishing you sunshine, smiles and the happiest heart, Ishu!",
+      "To my dearest Ishu, may laughter fill your day and love warm your heart!"
+    ];
+    let clickCount = 0;
+    function generateWish(){
+      clickCount++;
+      if (clickCount === 5) {
+        document.getElementById("wish").innerHTML = 
+          "Ishu, you’re my happiest place. 💖 Happy Birthday, my love!";
+      } else {
+        const idx = Math.floor(Math.random() * wishes.length);
+        document.getElementById("wish").innerHTML = wishes[idx];
+      }
+    }
+
+    // Music Control
+    const music = document.getElementById("bg-music");
+    const musicBtn = document.getElementById("music-btn");
+    function toggleMusic(){
+      if(music.paused){
+        music.play();
+        musicBtn.textContent = "Pause Music";
+      } else {
+        music.pause();
+        musicBtn.textContent = "Play Music";
+      }
+    }
+  </script>
+</body>
+</html>
